@@ -35,7 +35,7 @@ class AuthenticatorManagerTest extends KernelTestCase
 
         $this->assertTrue($manager->supports($request));
         $this->assertTrue($request->attributes->has('_security_authenticators'));
-        $this->assertTrue($request->attributes->has('_user_identifier_and_payload'));
+        $this->assertTrue($request->attributes->has('_user_identifier_claim_and_payload'));
 
         $controlledAuthenticators = $request->attributes->get('_security_authenticators');
 

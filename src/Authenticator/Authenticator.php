@@ -43,7 +43,7 @@ final class Authenticator extends AbstractAuthenticator implements Authenticatio
 
             if (null !== $payload && false !== is_string($payload[$mapping->userIdentifierClaim()] ?? null)) {
                 $request->attributes->set(
-                    '_user_identifier_and_payload',
+                    '_user_identifier_claim_and_payload',
                     [
                         $mapping->userIdentifierClaim(),
                         $payload,
@@ -59,8 +59,8 @@ final class Authenticator extends AbstractAuthenticator implements Authenticatio
 
     public function authenticate(Request $request): PassportInterface
     {
-        [$userIdentifierClaim, $payload] = $request->attributes->get('_user_identifier_and_payload');
-        $request->attributes->remove('_user_identifier_and_payload');
+        [$userIdentifierClaim, $payload] = $request->attributes->get('_user_identifier_claim_and_payload');
+        $request->attributes->remove('_user_identifier_claim_and_payload');
         $userBadge = new UserBadge($payload[$userIdentifierClaim], $this->makeUserLoader($payload));
         $passport = new SelfValidatingPassport($userBadge);
         $passport->setAttribute('_payload', $payload);

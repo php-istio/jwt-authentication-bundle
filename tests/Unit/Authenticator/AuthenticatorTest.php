@@ -36,7 +36,7 @@ class AuthenticatorTest extends TestCase
         $authenticator = $this->createAuthenticator(new InMemoryUserProvider());
 
         $this->assertTrue($authenticator->supports($request));
-        $this->assertTrue($request->attributes->has('_user_identifier_and_payload'));
+        $this->assertTrue($request->attributes->has('_user_identifier_claim_and_payload'));
     }
 
     /**
@@ -47,7 +47,7 @@ class AuthenticatorTest extends TestCase
         $authenticator = $this->createAuthenticator(new InMemoryUserProvider());
 
         $this->assertFalse($authenticator->supports($request));
-        $this->assertFalse($request->attributes->has('_user_identifier_and_payload'));
+        $this->assertFalse($request->attributes->has('_user_identifier_claim_and_payload'));
     }
 
     /**
@@ -57,11 +57,11 @@ class AuthenticatorTest extends TestCase
     public function testAuthenticate(Request $request)
     {
         $authenticator = $this->createAuthenticatorWithInMemoryUserProvider(['valid' => []]);
-        $authenticator->supports($request); // call to set `_user_identifier_and_payload` request attribute.
+        $authenticator->supports($request); // call to set `_user_identifier_claim_and_payload` request attribute.
 
         $passport = $authenticator->authenticate($request);
 
-        $this->assertFalse($request->attributes->has('_user_identifier_and_payload'));
+        $this->assertFalse($request->attributes->has('_user_identifier_claim_and_payload'));
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
         $this->assertTrue($passport->hasBadge(UserBadge::class));
         $this->assertIsArray($passport->getAttribute('_payload'));
@@ -80,9 +80,9 @@ class AuthenticatorTest extends TestCase
     {
         $payload = [];
         $authenticator = $this->createAuthenticatorWithJWTPayloadAwareUserProvider($payload);
-        $authenticator->supports($request); // call to set `_user_identifier_and_payload` request attribute.
+        $authenticator->supports($request); // call to set `_user_identifier_claim_and_payload` request attribute.
         $payload = $request->attributes->get(
-            '_user_identifier_and_payload'
+            '_user_identifier_claim_and_payload'
         )[1]; // set for mock assert see: [[createAuthenticatorWithJWTPayloadAwareUserProvider()]]
         $passport = $authenticator->authenticate($request);
         $user = $passport->getBadge(UserBadge::class)->getUser();
@@ -98,7 +98,7 @@ class AuthenticatorTest extends TestCase
     {
         $authenticator = $this->createAuthenticatorWithInMemoryUserProvider(['valid' => []]);
         $authenticator->supports($request);
-        $payload = $request->attributes->get('_user_identifier_and_payload')[1];
+        $payload = $request->attributes->get('_user_identifier_claim_and_payload')[1];
         $passport = $authenticator->authenticate($request);
         $token = $authenticator->createAuthenticatedToken($passport, 'test');
 
