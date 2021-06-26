@@ -1,0 +1,39 @@
+{
+  "name": "php-istio/jwt-authentication-bundle",
+  "description": "Symfony bundle to help authenticate JWT payload from Istio Envoy proxy.",
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Minh Vuong",
+      "email": "vuongxuongminh@gmail.com"
+    }
+  ],
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=8.0",
+    "nyholm/psr7": "^1.4",
+    "php-istio/jwt-payload-extractor": "^1.0",
+    "symfony/psr-http-message-bridge": "^2.1",
+    "symfony/security-bundle": "^5.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Istio\\Symfony\\JWTAuthentication\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Istio\\Symfony\\JWTAuthentication\\Tests\\": "tests"
+    }
+  },
+  "require-dev": {
+    "symfony/browser-kit": "^5.3",
+    "symfony/console": "^5.3",
+    "symfony/framework-bundle": "^5.3",
+    "symfony/phpunit-bridge": "^5.3"
+  }
+}
