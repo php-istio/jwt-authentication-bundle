@@ -11,9 +11,7 @@ declare(strict_types=1);
 namespace Istio\Symfony\JWTAuthentication\Authenticator;
 
 use Istio\Symfony\JWTAuthentication\User\JWTPayloadAwareUserProviderInterface;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -29,13 +27,14 @@ final class Authenticator extends AbstractAuthenticator implements Authenticatio
 {
     public function __construct(
         private iterable $userIdentifierClaimMappings,
-        private UserProviderInterface $userProvider
+        private UserProviderInterface $userProvider,
+        private HttpMessageFactoryInterface $httpMessageFactory
     ) {
     }
 
     public function supports(Request $request): ?bool
     {
-        $psr7Request = $this->normalizeRequest($request);
+        $psr7Request = $this->httpMessageFactory->createRequest($request);
 
         foreach ($this->userIdentifierClaimMappings as $mapping) {
             /** @var UserIdentifierClaimMapping $mapping */
@@ -102,13 +101,5 @@ final class Authenticator extends AbstractAuthenticator implements Authenticatio
     public function start(Request $request, AuthenticationException $authException = null)
     {
         return new Response('Istio JWT in request\'s missing or invalid.', Response::HTTP_UNAUTHORIZED);
-    }
-
-    private function normalizeRequest(Request $request): ServerRequestInterface
-    {
-        $psr17Factory = new Psr17Factory();
-        $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
-
-        return $psrHttpFactory->createRequest($request);
     }
 }

@@ -13,11 +13,15 @@ namespace Istio\Symfony\JWTAuthentication\Tests;
 use Istio\Symfony\JWTAuthentication\JWTAuthenticationBundle;
 use Istio\Symfony\JWTAuthentication\Tests\Fixtures\SecureController;
 use Istio\Symfony\JWTAuthentication\Tests\Fixtures\StatelessUser;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
@@ -130,16 +134,10 @@ class TestKernel extends Kernel implements CompilerPassInterface
         $container->getDefinition('security.authenticator.manager.test2')->setPublic(true);
     }
 
-    protected function build(ContainerBuilder $container)
-    {
-        parent::build($container);
-
-        $this->registerFixtures($container);
-    }
-
     public function process(ContainerBuilder $container)
     {
         $this->publicServices($container);
+        $this->registerFixtures($container);
     }
 
     private function registerFixtures(ContainerBuilder $container)
@@ -148,5 +146,12 @@ class TestKernel extends Kernel implements CompilerPassInterface
             ->register('secure_controller', SecureController::class)
             ->setPublic(true)
             ->addTag('controller.service_arguments');
+
+        $container->register(Psr17Factory::class, Psr17Factory::class);
+
+        $psr17Factory = new Reference(Psr17Factory::class);
+        $container
+            ->register(HttpMessageFactoryInterface::class, PsrHttpFactory::class)
+            ->setArguments([$psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory]);
     }
 }

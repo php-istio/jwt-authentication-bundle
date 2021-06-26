@@ -15,7 +15,9 @@ use Istio\Symfony\JWTAuthentication\Authenticator\Authenticator;
 use Istio\Symfony\JWTAuthentication\Authenticator\UserIdentifierClaimMapping;
 use Istio\Symfony\JWTAuthentication\Tests\Fixtures\TokenTrait;
 use Istio\Symfony\JWTAuthentication\User\JWTPayloadAwareUserProviderInterface;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -210,7 +212,10 @@ class AuthenticatorTest extends TestCase
 
     private function createAuthenticator(UserProviderInterface $userProvider): Authenticator
     {
-        return new Authenticator($this->getUserIdentifierClaimMappings(), $userProvider);
+        $psr17Factory = new Psr17Factory();
+        $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
+
+        return new Authenticator($this->getUserIdentifierClaimMappings(), $userProvider, $psrHttpFactory);
     }
 
     private function getUserIdentifierClaimMappings(): array

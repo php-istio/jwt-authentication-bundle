@@ -15,9 +15,8 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=8.0",
-    "nyholm/psr7": "^1.4",
     "php-istio/jwt-payload-extractor": "^1.0",
-    "symfony/psr-http-message-bridge": "^2.1",
+    "symfony/psr7-pack": "^1.0",
     "symfony/security-bundle": "^5.3"
   },
   "autoload": {

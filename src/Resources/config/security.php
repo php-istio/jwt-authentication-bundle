@@ -12,6 +12,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Istio\Symfony\JWTAuthentication\Authenticator\Authenticator;
 use Istio\Symfony\JWTAuthentication\User\StatelessUserProvider;
+use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -19,6 +20,7 @@ return static function (ContainerConfigurator $container) {
         ->abstract()
             ->arg(0, abstract_arg('user identifier claim mappings'))
             ->arg(1, abstract_arg('user provider'))
+            ->arg(2, service(HttpMessageFactoryInterface::class))
 
         ->set('istio.jwt_authentication.stateless_user_provider', StatelessUserProvider::class)
         ->abstract()
