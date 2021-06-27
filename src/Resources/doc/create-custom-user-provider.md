@@ -29,7 +29,7 @@ final class UserProvider implements JWTPayloadAwareUserProviderInterface {
     
     //.... 
     public function loadUserByIdentifier(string $identifier, array $payload = null) {
-       // use $identifier and $payload to create `UserInterface` instance.
+       // use $identifier and $payload to create instance of `UserInterface`.
     }
     
 }

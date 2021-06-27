@@ -41,7 +41,7 @@ security:
   # ...
 ```
 
-Configure your `config/packages/security.yaml`:
+Then, configure your `config/packages/security.yaml`:
 
 ```yaml
 security:
@@ -82,6 +82,8 @@ In case your application have multi issuers:
 Generate mock JWT token forwarded by Istio sidecar:
 
 ```shell
+#!/bin/bash
+
 payload='{"issuer":"issuer_1", "sub": "test"}'; \
 base64_payload=$(echo -n $payload | base64 -); \
 origin_token=$(echo "header.$base64_payload.signature")
@@ -90,12 +92,16 @@ origin_token=$(echo "header.$base64_payload.signature")
 You can test authenticate origin token with curl:
 
 ```shell
+#!/bin/bash
+
 curl -H "Authorization: $origin_token" http://localhost/
 ```
 
 Or authenticate base64 payload header:
 
 ```shell
+#!/bin/bash
+
 curl -H "X-Istio-JWT-Payload: $base64_header" http://localhost/
 ```
 
