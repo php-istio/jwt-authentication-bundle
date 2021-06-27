@@ -3,7 +3,8 @@ A stateless user provider
 
 This feature inspired by the awesome [Lexik JWT Authentication](https://github.com/lexik/LexikJWTAuthenticationBundle) bundle.
 
-Stateless user provider help to create user instances from the JWT payload.
+Stateless user provider help to create user instances from the JWT payload, avoiding the need to query the database more than once
+or in cases user is an identity of first or third party system.
 
 Configuring the user provider
 -----------------------------

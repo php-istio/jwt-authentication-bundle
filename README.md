@@ -9,9 +9,10 @@
 
 The Symfony bundle provides JWT authentication for request forwarded by Istio sidecar. 
 
-> To use this bundle, make sure your K8S application pod had injected Istio sidecar and [RequestAuthentication](https://istio.io/latest/docs/reference/config/security/request_authentication/) CRD had configured, if not your application **IS NOT SECURE**.
+> To use this bundle, make sure your K8S application pod had injected Istio sidecar and configured [RequestAuthentication](https://istio.io/latest/docs/reference/config/security/request_authentication/) CRD, if not your application **IS NOT SECURE**.
 
-The difference between this bundle and the awesome [Lexik JWT Authentication](https://github.com/lexik/LexikJWTAuthenticationBundle) bundle is it's **NOT** validate JWT token because Istio sidecar proxy had validated before forward request to your application,
+The main difference between the awesome [Lexik JWT Authentication](https://github.com/lexik/LexikJWTAuthenticationBundle) bundle
+and this bundle is it's **NOT** validate JWT token because Istio sidecar had validated before forward request to your application,
 so that your application don't need to hold public key and double validate JWT token.
 
 ## Requirements
@@ -76,17 +77,16 @@ In case your application have multi issuers:
         #....
 ```
 
-
-## Usages
+## Usage
 
 Generate mock JWT token forwarded by Istio sidecar:
 
 ```shell
 #!/bin/bash
 
-payload='{"issuer":"issuer_1", "sub": "test"}'; \
-base64_payload=$(echo -n $payload | base64 -); \
-origin_token=$(echo "header.$base64_payload.signature")
+payload='{"issuer":"issuer_1", "sub": "test"}';
+base64_payload=$(echo -n $payload | base64 -);
+origin_token=$(echo "header.$base64_payload.signature");
 ```
 
 You can test authenticate origin token with curl:
@@ -105,9 +105,9 @@ Or authenticate base64 payload header:
 curl -H "X-Istio-JWT-Payload: $base64_header" http://localhost/
 ```
 
-## Further readings:
+## Further readings
 
-+ [Get JWT payload of authenticated user](src/Resources/doc/stateless-user-provider.md)
++ [Get JWT payload of authenticated user](src/Resources/doc/get-jwt-payload-of-authenticated-user.md)
 + [Use stateless user provider](src/Resources/doc/stateless-user-provider.md)
 + [Create custom user provider](src/Resources/doc/create-custom-user-provider.md)
 
