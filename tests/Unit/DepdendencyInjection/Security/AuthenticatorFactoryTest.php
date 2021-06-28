@@ -139,9 +139,6 @@ class AuthenticatorFactoryTest extends TestCase
     {
         return [
             [
-                [],
-            ],
-            [
                 [
                     ['issuer' => ''],
                 ],
