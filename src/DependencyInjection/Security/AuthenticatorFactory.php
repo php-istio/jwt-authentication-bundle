@@ -61,7 +61,6 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
     public function addConfiguration(NodeDefinition $builder)
     {
         $builder
-            ->cannotBeEmpty()
             ->fixXmlConfig('origin_token_header')
             ->fixXmlConfig('origin_token_query_param')
             ->fixXmlConfig('base64_header')
