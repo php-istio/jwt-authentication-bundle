@@ -79,30 +79,22 @@ In case your application have multi issuers:
 
 ## Usage
 
-Generate mock JWT token forwarded by Istio sidecar:
-
 ```shell
 #!/bin/bash
+
+# Generate mock JWT token forwarded by Istio sidecar
 
 payload='{"issuer":"issuer_1", "sub": "test"}';
 base64_payload=$(echo -n $payload | base64 -);
 origin_token=$(echo "header.$base64_payload.signature");
-```
 
-You can test authenticate origin token with curl:
-
-```shell
-#!/bin/bash
+#You can test authenticate origin token with curl:
 
 curl -H "Authorization: $origin_token" http://localhost/
-```
 
-Or authenticate base64 payload header:
+#Or authenticate base64 payload header:
 
-```shell
-#!/bin/bash
-
-curl -H "X-Istio-JWT-Payload: $base64_header" http://localhost/
+curl -H "X-Istio-JWT-Payload: $base64_payload" http://localhost/
 ```
 
 ## Further readings
