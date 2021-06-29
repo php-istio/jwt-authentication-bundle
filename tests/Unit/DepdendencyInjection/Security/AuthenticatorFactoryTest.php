@@ -67,8 +67,10 @@ class AuthenticatorFactoryTest extends TestCase
     public function testCreateAuthenticator()
     {
         $config = [
-            ['issuer' => 'test', 'origin_token_headers' => ['authorization'], 'user_identifier_claim' => 'sub'],
-            ['issuer' => 'test2', 'origin_token_query_params' => ['token'], 'user_identifier_claim' => 'sub'],
+            'rules' => [
+                ['issuer' => 'test', 'origin_token_headers' => ['authorization'], 'user_identifier_claim' => 'sub'],
+                ['issuer' => 'test2', 'origin_token_query_params' => ['token'], 'user_identifier_claim' => 'sub'],
+            ],
         ];
 
         $this->executeCreate($config);
@@ -84,7 +86,7 @@ class AuthenticatorFactoryTest extends TestCase
     public function testThrowExceptionWhenCreateAuthenticatorWithNoneExtractor()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->executeCreate([['issuer' => 'test']]);
+        $this->executeCreate(['rules' => ['issuer' => 'test']]);
     }
 
     private function executeCreate(array $config)
@@ -98,37 +100,69 @@ class AuthenticatorFactoryTest extends TestCase
         return [
             [
                 [
-                    [
-                        'issuer' => 'example',
+                    'rules' => [
+                        [
+                            'issuer' => 'example',
+                        ],
                     ],
                 ],
                 [
-                    [
-                        'issuer' => 'example',
-                        'user_identifier_claim' => 'sub',
-                        'origin_token_headers' => [],
-                        'origin_token_query_params' => [],
-                        'base64_headers' => [],
+                    'rules' => [
+                        [
+                            'issuer' => 'example',
+                            'user_identifier_claim' => 'sub',
+                            'origin_token_headers' => [],
+                            'origin_token_query_params' => [],
+                            'base64_headers' => [],
+                        ],
                     ],
                 ],
             ],
             [
                 [
-                    [
-                        'issuer' => 'example',
-                        'user_identifier_claim' => 'id',
-                        'origin_token_headers' => ['authorization'],
-                        'origin_token_query_params' => ['token'],
-                        'base64_headers' => ['x-istio-jwt-payload'],
+                    'rules' => [
+                        [
+                            'issuer' => 'example',
+                            'user_identifier_claim' => 'id',
+                            'origin_token_headers' => ['authorization'],
+                            'origin_token_query_params' => ['token'],
+                            'base64_headers' => ['x-istio-jwt-payload'],
+                        ],
                     ],
                 ],
                 [
-                    [
-                        'issuer' => 'example',
-                        'user_identifier_claim' => 'id',
-                        'origin_token_headers' => ['authorization'],
-                        'origin_token_query_params' => ['token'],
-                        'base64_headers' => ['x-istio-jwt-payload'],
+                    'rules' => [
+                        [
+                            'issuer' => 'example',
+                            'user_identifier_claim' => 'id',
+                            'origin_token_headers' => ['authorization'],
+                            'origin_token_query_params' => ['token'],
+                            'base64_headers' => ['x-istio-jwt-payload'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                [
+                    'rules' => [
+                        [
+                            'issuer' => 'example',
+                            'user_identifier_claim' => 'id',
+                            'origin_token_header' => ['authorization'],
+                            'origin_token_query_param' => ['token'],
+                            'base64_header' => ['x-istio-jwt-payload'],
+                        ],
+                    ],
+                ],
+                [
+                    'rules' => [
+                        [
+                            'issuer' => 'example',
+                            'user_identifier_claim' => 'id',
+                            'origin_token_headers' => ['authorization'],
+                            'origin_token_query_params' => ['token'],
+                            'base64_headers' => ['x-istio-jwt-payload'],
+                        ],
                     ],
                 ],
             ],
@@ -139,33 +173,63 @@ class AuthenticatorFactoryTest extends TestCase
     {
         return [
             [
+                [],
+            ],
+            [
                 [
-                    ['issuer' => ''],
+                    'rules' => [],
                 ],
             ],
             [
                 [
-                    ['issuer' => 'example', 'user_identifier_claim' => ''],
+                    'rules' => [[]],
                 ],
             ],
             [
                 [
-                    ['issuer' => '', 'user_identifier_claim' => 'id'],
+                    'rules' => ['issuer' => ''],
                 ],
             ],
             [
                 [
-                    ['issuer' => 'example', 'origin_token_headers' => ['']],
+                    'rules' => [
+                        ['issuer' => ''],
+                    ],
                 ],
             ],
             [
                 [
-                    ['issuer' => 'example', 'origin_token_query_params' => ['']],
+                    'rules' => [
+                        ['issuer' => 'example', 'user_identifier_claim' => ''],
+                    ],
                 ],
             ],
             [
                 [
-                    ['issuer' => 'example', 'base64_headers' => ['']],
+                    'rules' => [
+                        ['issuer' => '', 'user_identifier_claim' => 'id'],
+                    ],
+                ],
+            ],
+            [
+                [
+                    'rules' => [
+                        ['issuer' => 'example', 'origin_token_headers' => ['']],
+                    ],
+                ],
+            ],
+            [
+                [
+                    'rules' => [
+                        ['issuer' => 'example', 'origin_token_query_params' => ['']],
+                    ],
+                ],
+            ],
+            [
+                [
+                    'rules' => [
+                        ['issuer' => 'example', 'base64_headers' => ['']],
+                    ],
                 ],
             ],
         ];
