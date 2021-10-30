@@ -26,12 +26,14 @@ return static function (ContainerConfigurator $container) {
         ->factory([ExtractorFactory::class, 'fromOriginTokenHeader'])
             ->arg(0, abstract_arg('issuer'))
             ->arg(1, abstract_arg('header name'))
+            ->arg(2, '') // token prefix
 
         ->set('istio.jwt_authentication.payload_extractor.origin_token.query_param', OriginTokenExtractor::class)
         ->abstract()
         ->factory([ExtractorFactory::class, 'fromOriginTokenQueryParam'])
             ->arg(0, abstract_arg('issuer'))
             ->arg(1, abstract_arg('param name'))
+            ->arg(2, '') // token prefix
 
         ->set('istio.jwt_authentication.payload_extractor.base64_header', Base64HeaderExtractor::class)
         ->abstract()

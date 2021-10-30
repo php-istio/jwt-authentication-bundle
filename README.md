@@ -61,6 +61,7 @@ security:
             origin_token_headers: [authorization] #Required at least once of `origin_token_headers`, `origin_token_query_params` or `base64_headers`. Use this option when your Istio JWTRule CRD using `forwardOriginalToken`.
             origin_token_query_params: [token] #Use this option when your Istio JWTRule CRD using `forwardOriginalToken` and your JWT token in query param.
             base64_headers: [x-istio-jwt-payload] # Use this option when your Istio JWTRule CRD using `outputPayloadToHeader`.
+            prefix: "Bearer " #Token prefix of origin token passthrough by default blank ("") if not set.
 ```
 
 In case your application have multi issuers:
@@ -73,6 +74,7 @@ In case your application have multi issuers:
         rules:
           - issuer: issuer_1
             origin_token_headers: [authorization]
+            prefix: "Bearer "
           - issuer: issuer_2
             user_identifier_claim: aud
             base64_headers: [x-istio-jwt-payload]
@@ -92,7 +94,7 @@ origin_token=$(echo "header.$base64_payload.signature");
 
 #You can test authenticate origin token with curl:
 
-curl -H "Authorization: $origin_token" http://localhost/
+curl -H "Authorization: Bearer $origin_token" http://localhost/
 
 #Or authenticate base64 payload header:
 

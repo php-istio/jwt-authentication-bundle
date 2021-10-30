@@ -91,6 +91,7 @@ class TestKernel extends Kernel implements CompilerPassInterface
                                             'issuer' => 'issuer_2',
                                             'user_identifier_claim' => 'id_2',
                                             'origin_token_headers' => ['authorization'],
+                                            'prefix' => 'Bearer ',
                                         ],
                                     ],
                                 ],
