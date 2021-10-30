@@ -68,8 +68,8 @@ class AuthenticatorFactoryTest extends TestCase
     {
         $config = [
             'rules' => [
-                ['issuer' => 'test', 'origin_token_headers' => ['authorization'], 'user_identifier_claim' => 'sub'],
-                ['issuer' => 'test2', 'origin_token_query_params' => ['token'], 'user_identifier_claim' => 'sub'],
+                ['issuer' => 'test', 'origin_token_headers' => ['authorization'], 'user_identifier_claim' => 'sub', 'prefix' => 'test'],
+                ['issuer' => 'test2', 'origin_token_query_params' => ['token'], 'user_identifier_claim' => 'sub', 'prefix' => null],
             ],
         ];
 
@@ -86,7 +86,7 @@ class AuthenticatorFactoryTest extends TestCase
     public function testThrowExceptionWhenCreateAuthenticatorWithNoneExtractor()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->executeCreate(['rules' => ['issuer' => 'test']]);
+        $this->executeCreate(['rules' => ['issuer' => 'test', 'prefix' => null]]);
     }
 
     private function executeCreate(array $config)
@@ -114,6 +114,7 @@ class AuthenticatorFactoryTest extends TestCase
                             'origin_token_headers' => [],
                             'origin_token_query_params' => [],
                             'base64_headers' => [],
+                            'prefix' => null,
                         ],
                     ],
                 ],
@@ -124,6 +125,7 @@ class AuthenticatorFactoryTest extends TestCase
                         [
                             'issuer' => 'example',
                             'user_identifier_claim' => 'id',
+                            'prefix' => 'Bearer ',
                             'origin_token_headers' => ['authorization'],
                             'origin_token_query_params' => ['token'],
                             'base64_headers' => ['x-istio-jwt-payload'],
@@ -135,6 +137,7 @@ class AuthenticatorFactoryTest extends TestCase
                         [
                             'issuer' => 'example',
                             'user_identifier_claim' => 'id',
+                            'prefix' => 'Bearer ',
                             'origin_token_headers' => ['authorization'],
                             'origin_token_query_params' => ['token'],
                             'base64_headers' => ['x-istio-jwt-payload'],
@@ -148,6 +151,7 @@ class AuthenticatorFactoryTest extends TestCase
                         [
                             'issuer' => 'example',
                             'user_identifier_claim' => 'id',
+                            'prefix' => null,
                             'origin_token_header' => ['authorization'],
                             'origin_token_query_param' => ['token'],
                             'base64_header' => ['x-istio-jwt-payload'],
@@ -159,6 +163,7 @@ class AuthenticatorFactoryTest extends TestCase
                         [
                             'issuer' => 'example',
                             'user_identifier_claim' => 'id',
+                            'prefix' => null,
                             'origin_token_headers' => ['authorization'],
                             'origin_token_query_params' => ['token'],
                             'base64_headers' => ['x-istio-jwt-payload'],

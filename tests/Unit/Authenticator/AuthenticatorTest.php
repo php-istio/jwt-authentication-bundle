@@ -223,11 +223,11 @@ class AuthenticatorTest extends TestCase
         return [
             new UserIdentifierClaimMapping(
                 'id_1',
-                ExtractorFactory::fromOriginTokenHeader('issuer_1', 'authorization')
+                ExtractorFactory::fromOriginTokenHeader('issuer_1', 'authorization', 'Bearer ')
             ),
             new UserIdentifierClaimMapping(
                 'id_2',
-                ExtractorFactory::fromOriginTokenQueryParam('issuer_2', 'token')
+                ExtractorFactory::fromOriginTokenQueryParam('issuer_2', 'token', '')
             ),
             new UserIdentifierClaimMapping(
                 'id_3',

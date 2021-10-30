@@ -15,7 +15,7 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=8.0",
-    "php-istio/jwt-payload-extractor": "^1.0",
+    "php-istio/jwt-payload-extractor": "^v1.1.1",
     "symfony/psr7-pack": "^1.0",
     "symfony/security-bundle": "^5.3"
   },

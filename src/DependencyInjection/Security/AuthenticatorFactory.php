@@ -95,6 +95,9 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
                                     ->cannotBeEmpty()
                                 ->end()
                             ->end()
+                            ->scalarNode('prefix')
+                                ->defaultNull()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -119,7 +122,8 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
                     sprintf('%s.origin_token_headers.%s', $extractorIdPrefix, $key),
                     'istio.jwt_authentication.payload_extractor.origin_token.header',
                     $rule['issuer'],
-                    $rule['origin_token_headers']
+                    $rule['origin_token_headers'],
+                    $rule['prefix']
                 );
             }
 
@@ -129,7 +133,8 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
                     sprintf('%s.origin_token_query_params.%s', $extractorIdPrefix, $key),
                     'istio.jwt_authentication.payload_extractor.origin_token.query_param',
                     $rule['issuer'],
-                    $rule['origin_token_query_params']
+                    $rule['origin_token_query_params'],
+                    $rule['prefix']
                 );
             }
 
@@ -163,7 +168,8 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
         string $id,
         string $fromAbstractId,
         string $issuer,
-        array $items
+        array $items,
+        ?string $prefix = null
     ): Reference {
         $definition = new ChildDefinition('istio.jwt_authentication.payload_extractor.composite');
         $container->setDefinition($id, $definition);
@@ -176,6 +182,11 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
             $subDefinition = new ChildDefinition($fromAbstractId);
             $subDefinition->replaceArgument(0, $issuer);
             $subDefinition->replaceArgument(1, $item);
+
+            if (null !== $prefix) {
+                $subDefinition->replaceArgument(2, $prefix);
+            }
+
             $container->setDefinition($subId, $subDefinition);
         }
 
