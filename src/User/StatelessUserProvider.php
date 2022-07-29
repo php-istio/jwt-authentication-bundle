@@ -46,9 +46,4 @@ final class StatelessUserProvider implements JWTPayloadAwareUserProviderInterfac
     {
         return is_a($class, StatelessUserInterface::class, true);
     }
-
-    public function loadUserByUsername(string $username)
-    {
-        // Deprecated
-    }
 }

@@ -29,24 +29,9 @@ class StatelessUser implements StatelessUserInterface
         return [];
     }
 
-    public function getPassword()
-    {
-        // TODO: Implement getPassword() method.
-    }
-
-    public function getSalt()
-    {
-        // TODO: Implement getSalt() method.
-    }
-
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
-    }
-
-    public function getUsername()
-    {
-        // TODO: Implement getUsername() method.
     }
 
     public function getUserIdentifier(): string
