@@ -25,6 +25,6 @@ final class JWTAuthenticationBundle extends Bundle
         /** @var SecurityExtension $extension */
         $extension = $container->getExtension('security');
         $extension->addUserProviderFactory(new StatelessUserProviderFactory());
-        $extension->addSecurityListenerFactory(new AuthenticatorFactory());
+        $extension->addAuthenticatorFactory(new AuthenticatorFactory());
     }
 }

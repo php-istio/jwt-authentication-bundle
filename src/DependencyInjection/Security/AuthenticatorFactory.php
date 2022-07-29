@@ -12,7 +12,6 @@ namespace Istio\Symfony\JWTAuthentication\DependencyInjection\Security;
 
 use Istio\Symfony\JWTAuthentication\Authenticator\UserIdentifierClaimMapping;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -21,31 +20,26 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-final class AuthenticatorFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
+final class AuthenticatorFactory implements AuthenticatorFactoryInterface
 {
+    public const PRIORITY = -40;
+
     public function createAuthenticator(
         ContainerBuilder $container,
         string $firewallName,
         array $config,
         string $userProviderId
-    ) {
+    ): string|array {
         $authenticator = sprintf('security.authenticator.istio_jwt_authenticator.%s', $firewallName);
         $definition = new ChildDefinition('istio.jwt_authentication.authenticator');
-        $definition->replaceArgument(0, $this->createUserIdentifierClaimMappings($container, $authenticator, $config['rules']));
+        $definition->replaceArgument(
+            0,
+            $this->createUserIdentifierClaimMappings($container, $authenticator, $config['rules'])
+        );
         $definition->replaceArgument(1, new Reference($userProviderId));
         $container->setDefinition($authenticator, $definition);
 
         return $authenticator;
-    }
-
-    public function create(
-        ContainerBuilder $container,
-        string $id,
-        array $config,
-        string $userProviderId,
-        ?string $defaultEntryPointId
-    ) {
-        throw new \LogicException('Istio JWT Authentication is not supported when "security.enable_authenticator_manager" is not set to true.');
     }
 
     public function getPosition()
@@ -53,7 +47,7 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
         return 'pre_auth';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'istio_jwt_authenticator';
     }
@@ -193,5 +187,10 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
         $definition->setArguments($subExtractors);
 
         return new Reference($id);
+    }
+
+    public function getPriority(): int
+    {
+        return self::PRIORITY;
     }
 }

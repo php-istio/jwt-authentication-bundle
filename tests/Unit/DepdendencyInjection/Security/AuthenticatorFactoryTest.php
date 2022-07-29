@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class AuthenticatorFactoryTest extends TestCase
@@ -54,14 +53,6 @@ class AuthenticatorFactoryTest extends TestCase
 
         // will validate and throw an exception on invalid
         $node->finalize($normalizedConfig);
-    }
-
-    public function testExceptionWhenCallCreate()
-    {
-        $this->expectException(\LogicException::class);
-
-        $factory = new AuthenticatorFactory();
-        $factory->create(new ContainerBuilder(), 'test', [], 'test', 'test');
     }
 
     public function testCreateAuthenticator()

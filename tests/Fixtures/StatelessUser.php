@@ -24,7 +24,7 @@ class StatelessUser implements StatelessUserInterface
         return $instance;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         return [];
     }
@@ -49,7 +49,7 @@ class StatelessUser implements StatelessUserInterface
         // TODO: Implement getUsername() method.
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         // TODO: Implement getUsername() method.
     }

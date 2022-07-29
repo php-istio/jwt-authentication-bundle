@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 class TestKernel extends Kernel implements CompilerPassInterface
 {
-    public function registerBundles()
+    public function registerBundles(): array
     {
         return [
             new FrameworkBundle(),
@@ -128,7 +128,7 @@ class TestKernel extends Kernel implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sprintf('%s/tests/.kernel/cache', $this->getProjectDir());
     }
@@ -136,7 +136,7 @@ class TestKernel extends Kernel implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sprintf('%s/tests/.kernel/logs', $this->getProjectDir());
     }
