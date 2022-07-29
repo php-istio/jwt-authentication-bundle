@@ -18,7 +18,7 @@ trait TokenTrait
         mixed $userIdentifier = 'valid'
     ): string {
         return sprintf(
-            'header.%s.signature',
+            'Bearer header.%s.signature',
             $this->getBase64Payload($issuer, $userIdentifierClaim, $userIdentifier)
         );
     }

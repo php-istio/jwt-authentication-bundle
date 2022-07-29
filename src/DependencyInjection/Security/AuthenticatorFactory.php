@@ -12,7 +12,6 @@ namespace Istio\Symfony\JWTAuthentication\DependencyInjection\Security;
 
 use Istio\Symfony\JWTAuthentication\Authenticator\UserIdentifierClaimMapping;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -21,31 +20,26 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-final class AuthenticatorFactory implements SecurityFactoryInterface, AuthenticatorFactoryInterface
+final class AuthenticatorFactory implements AuthenticatorFactoryInterface
 {
+    public const PRIORITY = -40;
+
     public function createAuthenticator(
         ContainerBuilder $container,
         string $firewallName,
         array $config,
         string $userProviderId
-    ) {
+    ): string|array {
         $authenticator = sprintf('security.authenticator.istio_jwt_authenticator.%s', $firewallName);
         $definition = new ChildDefinition('istio.jwt_authentication.authenticator');
-        $definition->replaceArgument(0, $this->createUserIdentifierClaimMappings($container, $authenticator, $config));
+        $definition->replaceArgument(
+            0,
+            $this->createUserIdentifierClaimMappings($container, $authenticator, $config['rules'])
+        );
         $definition->replaceArgument(1, new Reference($userProviderId));
         $container->setDefinition($authenticator, $definition);
 
         return $authenticator;
-    }
-
-    public function create(
-        ContainerBuilder $container,
-        string $id,
-        array $config,
-        string $userProviderId,
-        ?string $defaultEntryPointId
-    ) {
-        throw new \LogicException('Istio JWT Authentication is not supported when "security.enable_authenticator_manager" is not set to true.');
     }
 
     public function getPosition()
@@ -53,7 +47,7 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
         return 'pre_auth';
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'istio_jwt_authenticator';
     }
@@ -61,34 +55,43 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
     public function addConfiguration(NodeDefinition $builder)
     {
         $builder
-            ->cannotBeEmpty()
-            ->fixXmlConfig('origin_token_header')
-            ->fixXmlConfig('origin_token_query_param')
-            ->fixXmlConfig('base64_header')
-            ->arrayPrototype()
-                ->addDefaultsIfNotSet()
-                ->children()
-                    ->scalarNode('issuer')
-                        ->cannotBeEmpty()
-                        ->isRequired()
-                    ->end()
-                    ->scalarNode('user_identifier_claim')
-                        ->cannotBeEmpty()
-                        ->defaultValue('sub')
-                    ->end()
-                    ->arrayNode('origin_token_headers')
-                        ->scalarPrototype()
-                            ->cannotBeEmpty()
-                        ->end()
-                    ->end()
-                    ->arrayNode('origin_token_query_params')
-                        ->scalarPrototype()
-                            ->cannotBeEmpty()
-                        ->end()
-                    ->end()
-                    ->arrayNode('base64_headers')
-                        ->scalarPrototype()
-                            ->cannotBeEmpty()
+            ->fixXmlConfig('rule')
+            ->children()
+                ->arrayNode('rules')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                    ->arrayPrototype()
+                        ->fixXmlConfig('origin_token_header')
+                        ->fixXmlConfig('origin_token_query_param')
+                        ->fixXmlConfig('base64_header')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->scalarNode('issuer')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('user_identifier_claim')
+                                ->cannotBeEmpty()
+                                ->defaultValue('sub')
+                            ->end()
+                            ->arrayNode('origin_token_headers')
+                                ->scalarPrototype()
+                                    ->cannotBeEmpty()
+                                ->end()
+                            ->end()
+                            ->arrayNode('origin_token_query_params')
+                                ->scalarPrototype()
+                                    ->cannotBeEmpty()
+                                ->end()
+                            ->end()
+                            ->arrayNode('base64_headers')
+                                ->scalarPrototype()
+                                    ->cannotBeEmpty()
+                                ->end()
+                            ->end()
+                            ->scalarNode('prefix')
+                                ->defaultNull()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -98,42 +101,44 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
 
     private function createUserIdentifierClaimMappings(
         ContainerBuilder $container,
-        string $authenticatorName,
-        array $config,
+        string $authenticatorId,
+        array $rules,
     ): IteratorArgument {
-        $extractorIdPrefix = sprintf('%s.payload_extractor', $authenticatorName);
+        $extractorIdPrefix = sprintf('%s.payload_extractor', $authenticatorId);
         $mappings = [];
 
-        foreach ($config as $key => $item) {
+        foreach ($rules as $key => $rule) {
             $extractor = null;
 
-            if (!empty($item['origin_token_headers'])) {
+            if (!empty($rule['origin_token_headers'])) {
                 $extractor = $this->createPayloadExtractor(
                     $container,
                     sprintf('%s.origin_token_headers.%s', $extractorIdPrefix, $key),
                     'istio.jwt_authentication.payload_extractor.origin_token.header',
-                    $item['issuer'],
-                    $item['origin_token_headers']
+                    $rule['issuer'],
+                    $rule['origin_token_headers'],
+                    $rule['prefix']
                 );
             }
 
-            if (!empty($item['origin_token_query_params'])) {
+            if (!empty($rule['origin_token_query_params'])) {
                 $extractor = $this->createPayloadExtractor(
                     $container,
                     sprintf('%s.origin_token_query_params.%s', $extractorIdPrefix, $key),
                     'istio.jwt_authentication.payload_extractor.origin_token.query_param',
-                    $item['issuer'],
-                    $item['origin_token_query_params']
+                    $rule['issuer'],
+                    $rule['origin_token_query_params'],
+                    $rule['prefix']
                 );
             }
 
-            if (!empty($item['base64_headers'])) {
+            if (!empty($rule['base64_headers'])) {
                 $extractor = $this->createPayloadExtractor(
                     $container,
                     sprintf('%s.base64_headers.%s', $extractorIdPrefix, $key),
                     'istio.jwt_authentication.payload_extractor.base64_header',
-                    $item['issuer'],
-                    $item['base64_headers']
+                    $rule['issuer'],
+                    $rule['base64_headers']
                 );
             }
 
@@ -141,10 +146,10 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
                 throw new InvalidConfigurationException(sprintf('`%s`: at least once `origin_token_headers`, `origin_token_query_params`, `base64_headers` should be config when using', $this->getKey()));
             }
 
-            $mappingId = sprintf('%s.user_identifier_claim_mapping.%s', $authenticatorName, $key);
+            $mappingId = sprintf('%s.user_identifier_claim_mapping.%s', $authenticatorId, $key);
             $mappings[] = new Reference($mappingId);
             $mappingDefinition = new Definition(UserIdentifierClaimMapping::class);
-            $mappingDefinition->setArgument(0, $item['user_identifier_claim']);
+            $mappingDefinition->setArgument(0, $rule['user_identifier_claim']);
             $mappingDefinition->setArgument(1, $extractor);
             $container->setDefinition($mappingId, $mappingDefinition);
         }
@@ -157,7 +162,8 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
         string $id,
         string $fromAbstractId,
         string $issuer,
-        array $items
+        array $items,
+        ?string $prefix = null
     ): Reference {
         $definition = new ChildDefinition('istio.jwt_authentication.payload_extractor.composite');
         $container->setDefinition($id, $definition);
@@ -170,11 +176,21 @@ final class AuthenticatorFactory implements SecurityFactoryInterface, Authentica
             $subDefinition = new ChildDefinition($fromAbstractId);
             $subDefinition->replaceArgument(0, $issuer);
             $subDefinition->replaceArgument(1, $item);
+
+            if (null !== $prefix) {
+                $subDefinition->replaceArgument(2, $prefix);
+            }
+
             $container->setDefinition($subId, $subDefinition);
         }
 
         $definition->setArguments($subExtractors);
 
         return new Reference($id);
+    }
+
+    public function getPriority(): int
+    {
+        return self::PRIORITY;
     }
 }

@@ -21,7 +21,7 @@ final class StatelessUserProvider implements JWTPayloadAwareUserProviderInterfac
         }
     }
 
-    public function loadUserByIdentifier(string $identifier, array $payload = null)
+    public function loadUserByIdentifier(string $identifier, array $payload = null): UserInterface
     {
         if (null === $payload) {
             throw new \LogicException(sprintf('`$payload` must be set when use %s!', self::class));
@@ -37,18 +37,13 @@ final class StatelessUserProvider implements JWTPayloadAwareUserProviderInterfac
         return $cache[$key];
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         return $user;
     }
 
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return is_a($class, StatelessUserInterface::class, true);
-    }
-
-    public function loadUserByUsername(string $username)
-    {
-        // Deprecated
     }
 }

@@ -96,13 +96,13 @@ class AuthenticatorTest extends TestCase
      * @dataProvider validRequests
      * @depends      testAuthenticate
      */
-    public function testCreateAuthenticatedToken(Request $request)
+    public function testCreateToken(Request $request)
     {
         $authenticator = $this->createAuthenticatorWithInMemoryUserProvider(['valid' => []]);
         $authenticator->supports($request);
         $payload = $request->attributes->get('_user_identifier_claim_and_payload')[1];
         $passport = $authenticator->authenticate($request);
-        $token = $authenticator->createAuthenticatedToken($passport, 'test');
+        $token = $authenticator->createToken($passport, 'test');
 
         $this->assertTrue($token->hasAttribute('jwt_payload'));
         $this->assertSame($payload, $token->getAttribute('jwt_payload'));
@@ -223,11 +223,11 @@ class AuthenticatorTest extends TestCase
         return [
             new UserIdentifierClaimMapping(
                 'id_1',
-                ExtractorFactory::fromOriginTokenHeader('issuer_1', 'authorization')
+                ExtractorFactory::fromOriginTokenHeader('issuer_1', 'authorization', 'Bearer ')
             ),
             new UserIdentifierClaimMapping(
                 'id_2',
-                ExtractorFactory::fromOriginTokenQueryParam('issuer_2', 'token')
+                ExtractorFactory::fromOriginTokenQueryParam('issuer_2', 'token', '')
             ),
             new UserIdentifierClaimMapping(
                 'id_3',

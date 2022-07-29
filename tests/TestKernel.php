@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 class TestKernel extends Kernel implements CompilerPassInterface
 {
-    public function registerBundles()
+    public function registerBundles(): array
     {
         return [
             new FrameworkBundle(),
@@ -68,15 +68,17 @@ class TestKernel extends Kernel implements CompilerPassInterface
                                 'provider' => 'istio',
                                 'stateless' => true,
                                 'istio_jwt_authenticator' => [
-                                    [
-                                        'issuer' => 'issuer_1',
-                                        'user_identifier_claim' => 'id_1',
-                                        'origin_token_query_params' => ['token'],
-                                    ],
-                                    [
-                                        'issuer' => 'issuer_2',
-                                        'user_identifier_claim' => 'id_2',
-                                        'base64_headers' => ['x-istio-jwt-payload'],
+                                    'rules' => [
+                                        [
+                                            'issuer' => 'issuer_1',
+                                            'user_identifier_claim' => 'id_1',
+                                            'origin_token_query_params' => ['token'],
+                                        ],
+                                        [
+                                            'issuer' => 'issuer_2',
+                                            'user_identifier_claim' => 'id_2',
+                                            'base64_headers' => ['x-istio-jwt-payload'],
+                                        ],
                                     ],
                                 ],
                             ],
@@ -84,11 +86,22 @@ class TestKernel extends Kernel implements CompilerPassInterface
                                 'provider' => 'memory',
                                 'stateless' => true,
                                 'istio_jwt_authenticator' => [
-                                    [
-                                        'issuer' => 'issuer_2',
-                                        'user_identifier_claim' => 'id_2',
-                                        'origin_token_headers' => ['authorization'],
+                                    'rules' => [
+                                        [
+                                            'issuer' => 'issuer_2',
+                                            'user_identifier_claim' => 'id_2',
+                                            'origin_token_headers' => ['authorization'],
+                                            'prefix' => 'Bearer ',
+                                        ],
                                     ],
+                                ],
+                            ],
+                            // Test not affect another authenticator
+                            'test3' => [
+                                'provider' => 'istio',
+                                'stateless' => true,
+                                'http_basic' => [
+                                    'realm' => 'Test',
                                 ],
                             ],
                         ],
@@ -115,7 +128,7 @@ class TestKernel extends Kernel implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sprintf('%s/tests/.kernel/cache', $this->getProjectDir());
     }
@@ -123,7 +136,7 @@ class TestKernel extends Kernel implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sprintf('%s/tests/.kernel/logs', $this->getProjectDir());
     }

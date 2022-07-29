@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
@@ -56,7 +56,7 @@ final class Authenticator extends AbstractAuthenticator implements Authenticatio
         return false;
     }
 
-    public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): Passport
     {
         [$userIdentifierClaim, $payload] = $request->attributes->get('_user_identifier_claim_and_payload');
         $request->attributes->remove('_user_identifier_claim_and_payload');
@@ -88,17 +88,17 @@ final class Authenticator extends AbstractAuthenticator implements Authenticatio
         throw $exception;
     }
 
-    public function createAuthenticatedToken(PassportInterface $passport, string $firewallName): TokenInterface
+    public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         /** @var SelfValidatingPassport $passport */
         $payload = $passport->getAttribute('_payload');
-        $token = parent::createAuthenticatedToken($passport, $firewallName);
+        $token = parent::createToken($passport, $firewallName);
         $token->setAttribute('jwt_payload', $payload);
 
         return $token;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
         return new Response('Istio JWT in request\'s missing or invalid.', Response::HTTP_UNAUTHORIZED);
     }

@@ -24,19 +24,9 @@ class StatelessUser implements StatelessUserInterface
         return $instance;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         return [];
-    }
-
-    public function getPassword()
-    {
-        // TODO: Implement getPassword() method.
-    }
-
-    public function getSalt()
-    {
-        // TODO: Implement getSalt() method.
     }
 
     public function eraseCredentials()
@@ -44,12 +34,7 @@ class StatelessUser implements StatelessUserInterface
         // TODO: Implement eraseCredentials() method.
     }
 
-    public function getUsername()
-    {
-        // TODO: Implement getUsername() method.
-    }
-
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         // TODO: Implement getUsername() method.
     }
